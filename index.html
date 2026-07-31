@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ကျောင်းသား/ဝန်ထမ်း ဆိုင်းအင် စနစ်</title>
+    <title>ကျောင်းသား တက်ရောက်/ပျက်ကွက် မှတ်တမ်းစနစ်</title>
     <style>
         * {
             box-sizing: border-box;
@@ -23,10 +23,10 @@
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             width: 100%;
-            max-width: 450px;
+            max-width: 500px;
             margin-bottom: 20px;
         }
-        h2 {
+        h2, h3 {
             text-align: center;
             color: #333;
             margin-top: 0;
@@ -63,9 +63,14 @@
         button:hover {
             background-color: #218838;
         }
-        .table-container {
+        .tables-wrapper {
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .table-container {
             background: white;
             padding: 20px;
             border-radius: 10px;
@@ -86,6 +91,9 @@
             background-color: #007bff;
             color: white;
         }
+        .absent-header {
+            background-color: #dc3545;
+        }
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
@@ -98,6 +106,14 @@
         .clear-btn:hover {
             background-color: #c82333;
         }
+        .badge-present {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .badge-absent {
+            color: #dc3545;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -107,98 +123,178 @@
         <h2>အလုပ်ဝင်/တက်ရောက်ကြောင်း မှတ်တမ်း</h2>
         <form id="attendanceForm">
             <div class="form-group">
-                <label for="empName">အမည်:</label>
-                <input type="text" id="empName" placeholder="ဥပမာ - မောင်မောင်" required>
-            </div>
-            <div class="form-group">
                 <label for="studentGrade">အတန်း ရွေးချယ်ပါ:</label>
-                <!-- Multiple Choice (Dropdown List) -->
-                <select id="studentGrade" required>
+                <select id="studentGrade" onchange="updateStudentOptions()" required>
                     <option value="" disabled selected>-- အတန်းရွေးပါ --</option>
                     <option value="Grade 12">Grade 12</option>
-                    <option value="Grade 11">Grade 11</option>
                     <option value="Grade 10">Grade 10</option>
                     <option value="Grade 9">Grade 9</option>
-                    <option value="Grade 8">Grade 8</option>
                     <option value="Grade 7">Grade 7</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="empName">ကျောင်းသား/သူ အမည်:</label>
+                <select id="empName" required disabled>
+                    <option value="" disabled selected>-- အရင်ဆုံး အတန်းရွေးပါ --</option>
                 </select>
             </div>
             <button type="submit">Sign In (ဆိုင်းအင် ထိုးမည်)</button>
         </form>
     </div>
 
-    <!-- မှတ်တမ်းဇယား -->
-    <div class="table-container">
-        <h3>ယနေ့ ဆိုင်းအင် ဝင်ထားသူများ စာရင်း</h3>
-        <table id="attendanceTable">
-            <thead>
-                <tr>
-                    <th>စဉ်</th>
-                    <th>အမည်</th>
-                    <th>အတန်း</th>
-                    <th>ရက်စွဲ</th>
-                    <th>ဝင်ရောက်သည့် အချိန်</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <!-- Data များ ဒီနေရာမှာ ပေါ်လာမည် -->
-            </tbody>
-        </table>
-        <button class="clear-btn" onclick="clearData()">မှတ်တမ်းများ ရှင်းထုတ်မည်</button>
+    <!-- မှတ်တမ်းဇယားများ -->
+    <div class="tables-wrapper">
+        
+        <!-- တက်ရောက်သူများ ဇယား -->
+        <div class="table-container">
+            <h3 style="color: #28a745;">ယနေ့ တက်ရောက်သူများ စာရင်း (Present)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>စဉ်</th>
+                        <th>အမည်</th>
+                        <th>အတန်း</th>
+                        <th>ဝင်ရောက်သည့် အချိန်</th>
+                        <th>အခြေအနေ</th>
+                    </tr>
+                </thead>
+                <tbody id="presentBody">
+                    <!-- Data များ ဒီနေရာမှာ ပေါ်လာမည် -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ပျက်ကွက်သူများ ဇယား -->
+        <div class="table-container">
+            <h3 style="color: #dc3545;">ယနေ့ ပျက်ကွက်သူများ စာရင်း (Absent)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="absent-header">စဉ်</th>
+                        <th class="absent-header">အမည်</th>
+                        <th class="absent-header">အတန်း</th>
+                        <th class="absent-header">အခြေအနေ</th>
+                    </tr>
+                </thead>
+                <tbody id="absentBody">
+                    <!-- ပျက်ကွက်သူများ ဒီနေရာမှာ အလိုအလျောက် ပေါ်လာမည် -->
+                </tbody>
+            </table>
+            <button class="clear-btn" onclick="clearData()">ယနေ့ မှတ်တမ်းများ ပြန်ရှင်းမည်</button>
+        </div>
+
     </div>
 
     <script>
-        const form = document.getElementById('attendanceForm');
-        const tableBody = document.getElementById('tableBody');
+        // ကျောင်းသား မာစတာ စာရင်း (ဒီနေရာမှာ ကျောင်းသား အမည်များကို ပြင်ဆင်/ထပ်တိုးနိုင်ပါတယ်)
+        const masterStudents = [
+            { name: "မောင်မောင်", grade: "Grade 12" },
+            { name: "အောင်အောင်", grade: "Grade 12" },
+            { name: "မလှလှ", grade: "Grade 12" },
+            { name: "ကျော်ကျော်", grade: "Grade 10" },
+            { name: "မြမြ", grade: "Grade 10" },
+            { name: "သန်းသန်း", grade: "Grade 9" },
+            { name: "ဇော်ဇော်", grade: "Grade 9" },
+            { name: "နုနု", grade: "Grade 7" },
+            { name: "စိုးစိုး", grade: "Grade 7" }
+        ];
 
-        document.addEventListener('DOMContentLoaded', displayRecords);
+        const form = document.getElementById('attendanceForm');
+        const gradeSelect = document.getElementById('studentGrade');
+        const nameSelect = document.getElementById('empName');
+        const presentBody = document.getElementById('presentBody');
+        const absentBody = document.getElementById('absentBody');
+
+        document.addEventListener('DOMContentLoaded', displayTables);
+
+        // အတန်း ရွေးလိုက်ပါက ထိုအတန်းရှိ ကျောင်းသား နာမည်များသာ Dropdown တွင် ပေါ်စေရန်
+        function updateStudentOptions() {
+            const selectedGrade = gradeSelect.value;
+            nameSelect.innerHTML = '<option value="" disabled selected>-- နာမည်ရွေးပါ --</option>';
+            
+            const filteredStudents = masterStudents.filter(s => s.grade === selectedGrade);
+            filteredStudents.forEach(student => {
+                const opt = document.createElement('option');
+                opt.value = student.name;
+                opt.textContent = student.name;
+                nameSelect.appendChild(opt);
+            });
+
+            nameSelect.disabled = false;
+        }
 
         form.addEventListener('submit', function(e) {
             e.preventDefault();
 
-            const empName = document.getElementById('empName').value;
-            const studentGrade = document.getElementById('studentGrade').value;
-            
+            const studentGrade = gradeSelect.value;
+            const empName = nameSelect.value;
             const now = new Date();
-            const dateStr = now.toLocaleDateString('my-MM');
             const timeStr = now.toLocaleTimeString();
 
-            const record = {
+            let records = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
+            
+            // ထပ်ပြီး Sign In မဝင်အောင် စစ်ဆေးခြင်း
+            const alreadySignedIn = records.some(r => r.name === empName && r.grade === studentGrade);
+            if (alreadySignedIn) {
+                alert('ဒီကျောင်းသား ဆိုင်းအင် ထိုးပြီးသား ဖြစ်ပါတယ်။');
+                return;
+            }
+
+            records.push({
                 name: empName,
                 grade: studentGrade,
-                date: dateStr,
                 time: timeStr
-            };
+            });
 
-            let records = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
-            records.push(record);
             localStorage.setItem('attendanceRecords', JSON.stringify(records));
 
             form.reset();
-            displayRecords();
+            nameSelect.disabled = true;
+                nameSelect.innerHTML = '<option value="" disabled selected>-- အရင်ဆုံး အတန်းရွေးပါ --</option>';
+
+            displayTables();
         });
 
-        function displayRecords() {
+        function displayTables() {
             let records = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
-            tableBody.innerHTML = '';
-
+            
+            // ၁။ တက်ရောက်သူများ ဇယား ပြသခြင်း
+            presentBody.innerHTML = '';
             records.forEach((rec, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${index + 1}</td>
                     <td>${rec.name}</td>
                     <td>${rec.grade}</td>
-                    <td>${rec.date}</td>
                     <td>${rec.time}</td>
+                    <td><span class="badge-present">တက်ရောက်</span></td>
                 `;
-                tableBody.appendChild(row);
+                presentBody.appendChild(row);
+            });
+
+            // ၂။ ပျက်ကွက်သူများ ဇယား တွက်ချက် ပြသခြင်း
+            absentBody.innerHTML = '';
+            let absentIndex = 1;
+
+            masterStudents.forEach(student => {
+                const isPresent = records.some(r => r.name === student.name && r.grade === student.grade);
+                if (!isPresent) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${absentIndex++}</td>
+                        <td>${student.name}</td>
+                        <td>${student.grade}</td>
+                        <td><span class="badge-absent">ပျက်ကွက်</span></td>
+                    `;
+                    absentBody.appendChild(row);
+                }
             });
         }
 
         function clearData() {
-            if (confirm('မှတ်တမ်းအားလုံးကို ဖျက်ရန် သေချာပါသလား?')) {
+            if (confirm('ယနေ့ မှတ်တမ်းအားလုံးကို ရှင်းလင်းရန် သေချာပါသလား?')) {
                 localStorage.removeItem('attendanceRecords');
-                displayRecords();
+                displayTables();
             }
         }
     </script>
