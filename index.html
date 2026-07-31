@@ -21,7 +21,7 @@
         .submit-btn:disabled { background-color: #ccc; cursor: not-allowed; }
 
         /* Notification Badge */
-        .notif-badge { background-color: #dc3545; color: white; padding: 3px 8px; border-radius: 12px; font-size: 12px; margin-left: 5px; }
+        .notif-badge { background-color: #dc3545; color: white; padding: 4px 10px; border-radius: 12px; font-size: 13px; margin-left: 8px; }
 
         /* Modal Box UI */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
@@ -36,7 +36,6 @@
         .admin-controls { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-top: 15px; }
         .btn { padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
         .btn-primary { background-color: #1a73e8; color: white; }
-        .btn-danger { background-color: #dc3545; color: white; }
         .btn-warning { background-color: #d97706; color: white; }
         .btn-success { background-color: #28a745; color: white; }
 
@@ -55,6 +54,10 @@
         .badge-approved { background: #28a745; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
         .badge-pending { background: #ffc107; color: #333; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
         .table-responsive { overflow-x: auto; }
+
+        .admin-login-link { text-align: center; margin-top: 20px; }
+        .admin-link-btn { background: transparent; border: 1px dashed #1a73e8; color: #1a73e8; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; }
+        .admin-link-btn:hover { background-color: #e8f0fe; }
     </style>
 </head>
 <body>
@@ -64,7 +67,7 @@
         <h2>ကျောင်းသား တက်ရောက်မှု / ပျက်ကွက်မှု တင်ရန်</h2>
 
         <div id="closedBanner" class="status-closed-banner" style="display: none;">
-            ⚠️ ယနေ့အတွက် စာရင်းတင်ခြင်းကို ဆရာမမှ ပိတ်ထားပါသည် (သို့မဟုတ်) ပိတ်သွားပါပြီ။
+            ⚠️ ယနေ့အတွက် စာရင်းတင်ခြင်းကို ပိတ်ထားပါသည်
         </div>
 
         <form id="attendanceForm">
@@ -75,7 +78,7 @@
                 </div>
                 <div class="form-group">
                     <label>ကျောင်းသား/သူ အမည်:</label>
-                    <input type="text" id="studentName" placeholder="ဥပမာ - မောင်မောင်" required>
+                    <input type="text" id="studentName" placeholder="အမည် ရိုက်ပါ" required>
                 </div>
             </div>
 
@@ -99,14 +102,19 @@
 
             <div class="form-group" id="reasonGroup" style="display: none;">
                 <label>ပျက်ကွက်ရသည့် အကြောင်းအရင်း (ခွင့်စာ):</label>
-                <input type="text" id="leaveReason" placeholder="ဥပမာ - နေမကောင်းလို့ပါ / အိမ်မှာ ကိစ္စရှိလို့ပါ">
+                <input type="text" id="leaveReason" placeholder="အကြောင်းအရင်း ရိုက်ပါ">
             </div>
 
             <button type="submit" id="submitBtn" class="submit-btn">Submit ပြုလုပ်မည်</button>
         </form>
+
+        <!-- Admin Access Link (Positioned at the bottom of Student section) -->
+        <div class="admin-login-link">
+            <button class="admin-link-btn" onclick="openAdminModal()">🔒 ဆရာ/မ မုဒ်သို့ ဝင်မည်</button>
+        </div>
     </div>
 
-    <!-- Modal Box Notification -->
+    <!-- Notification Modal Box -->
     <div id="statusModal" class="modal-overlay">
         <div class="modal-box">
             <div id="modalIcon" class="modal-icon">⏳</div>
@@ -116,25 +124,30 @@
         </div>
     </div>
 
-    <!-- Admin Panel & Displays -->
-    <div class="container">
+    <!-- Admin Login Modal -->
+    <div id="adminLoginModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-icon">🔑</div>
+            <div class="modal-title">ဆရာ/မ မုဒ် ဝင်ရောက်ရန်</div>
+            <div style="margin: 15px 0;">
+                <input type="password" id="adminPass" placeholder="လျှို့ဝှက်နံပါတ် ရိုက်ပါ (1234)">
+            </div>
+            <button class="modal-btn" onclick="checkAdmin()">Login ဝင်မည်</button>
+            <button class="modal-btn" style="background-color: #6c757d; margin-left: 5px;" onclick="closeAdminModal()">မလုပ်တော့ပါ</button>
+        </div>
+    </div>
+
+    <!-- Admin Panel Container (Only Displayed when Logged In) -->
+    <div class="container" id="adminPanelSection" style="display: none;">
         <div class="admin-box">
-            <h3 style="margin-bottom: 10px;">
+            <h3 style="margin-bottom: 10px; text-align: left;">
                 🔐 ဆရာ/မ စစ်ဆေးအတည်ပြုသည့် Panel 
-                <span id="pendingNotifBadge" class="notif-badge" style="display: none;">စာရင်းအသစ်ရှိသည်</span>
+                <span id="pendingNotifBadge" class="notif-badge" style="display: none;"></span>
             </h3>
 
-            <!-- Admin Authentication -->
-            <div id="adminAuth" style="text-align: center;">
-                <input type="password" id="adminPass" placeholder="လျှို့ဝှက်နံပါတ် ရိုက်ပါ (1234)" style="width: 220px; display: inline-block;">
-                <button class="btn btn-primary" onclick="checkAdmin()">Login ဝင်မည်</button>
-            </div>
-
-            <!-- Admin Controls (Only visible after Login) -->
-            <div id="adminControls" style="display: none;">
-                <p style="color: green; font-weight: bold; margin: 0;">✅ ဆရာမ Admin Mode ဖွင့်ထားပါသည်။</p>
+            <div id="adminControls">
+                <p style="color: green; font-weight: bold; margin: 0;">✅ ဆရာမ Admin Mode ဝင်ရောက်ထားပါသည်။</p>
                 
-                <!-- Date Filtering Feature for Admin Only -->
                 <div class="date-filter-box">
                     <label for="filterDate" style="margin: 0; font-weight: bold;">📅 စာရင်း ပြန်ကြည့်လိုသည့် ရက်စွဲ ရွေးပါ:</label>
                     <input type="date" id="filterDate" onchange="loadData()" style="width: auto;">
@@ -146,7 +159,7 @@
                         <button id="toggleLockBtn" class="btn btn-warning" onclick="toggleFormLock()">🔒 ယနေ့အတွက် စာရင်းပိတ်မည်</button>
                     </div>
                     <div>
-                        <button class="btn" style="background:#6c757d; color:white;" onclick="logoutAdmin()">Logout</button>
+                        <button class="btn" style="background:#6c757d; color:white;" onclick="logoutAdmin()">Logout ထွက်မည်</button>
                     </div>
                 </div>
             </div>
@@ -161,7 +174,7 @@
             <div id="presentBox" class="accordion-content">
                 <div class="table-responsive">
                     <table>
-                        <thead><tr><th>အမည်</th><th>အတန်း</th><th>ရက်စွဲနှင့် အချိန် (12-hr)</th><th>အခြေအနေ</th><th>အတည်ပြုချက်</th></tr></thead>
+                        <thead><tr><th>အမည်</th><th>အတန်း</th><th>ရက်စွဲနှင့် အချိန်</th><th>အခြေအနေ</th><th>အတည်ပြုချက်</th></tr></thead>
                         <tbody id="presentBody"></tbody>
                     </table>
                 </div>
@@ -177,17 +190,17 @@
             <div id="leaveBox" class="accordion-content">
                 <div class="table-responsive">
                     <table>
-                        <thead><tr><th>အမည်</th><th>အတန်း</th><th>ရက်စွဲနှင့် အချိန် (12-hr)</th><th>အကြောင်းအရင်း</th><th>အခြေအနေ</th><th>အတည်ပြုချက်</th></tr></thead>
+                        <thead><tr><th>အမည်</th><th>အတန်း</th><th>ရက်စွဲနှင့် အချိန်</th><th>အကြောင်းအရင်း</th><th>အခြေအနေ</th><th>အတည်ပြုချက်</th></tr></thead>
                         <tbody id="leaveBody"></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- 3. Absent List (Visible ONLY to Admin) -->
-        <div class="accordion-item" id="absentAccordionGroup" style="display: none;">
+        <!-- 3. Absent List -->
+        <div class="accordion-item">
             <button class="accordion-btn btn-absent" onclick="toggleAcc('absentBox')">
-                <span>❌ ခွင့်မဲ့ ပျက်ကွက်သူများ စာရင်း (ဆရာမကြည့်ရန်)</span>
+                <span>❌ ခွင့်မဲ့ ပျက်ကွက်သူများ စာရင်း</span>
                 <span id="absentCount">(0) 🔽</span>
             </button>
             <div id="absentBox" class="accordion-content">
@@ -212,7 +225,6 @@
 
         let isAdmin = false;
 
-        // ရက်စွဲ YYYY-MM-DD (ISO Format for logic)
         function getTodayISO() {
             const d = new Date();
             const year = d.getFullYear();
@@ -221,10 +233,9 @@
             return `${year}-${month}-${day}`;
         }
 
-        // ရက်စွဲ + အချိန် Live Clock (12-Hour Format with Seconds)
         function updateLiveClock() {
             const d = new Date();
-            const dateStr = d.toLocaleDateString('en-GB'); // DD/MM/YYYY
+            const dateStr = d.toLocaleDateString('en-GB');
             let hours = d.getHours();
             const minutes = String(d.getMinutes()).padStart(2, '0');
             const seconds = String(d.getSeconds()).padStart(2, '0');
@@ -237,19 +248,24 @@
             document.getElementById('todayDateTimeDisplay').value = liveDisplay;
         }
 
-        // 1 စက္ကန့်တိုင်း အချိန်အလိုအလျောက် ပုံမှန် ပြောင်းလဲပေးခြင်း
         setInterval(updateLiveClock, 1000);
         updateLiveClock();
 
-        // Setup Initial UI States
         document.getElementById('filterDate').value = getTodayISO();
 
-        // Admin Password Input မှာ Enter ခေါက်ရင် Login ဝင်စေခြင်း
         document.getElementById('adminPass').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                checkAdmin();
-            }
+            if (e.key === 'Enter') checkAdmin();
         });
+
+        function openAdminModal() {
+            document.getElementById('adminLoginModal').style.display = 'flex';
+            document.getElementById('adminPass').focus();
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminLoginModal').style.display = 'none';
+            document.getElementById('adminPass').value = '';
+        }
 
         function toggleReason() {
             const action = document.getElementById('actionType').value;
@@ -262,11 +278,10 @@
         }
 
         function checkAdmin() {
-            if (document.getElementById('adminPass').value === '1234') {
+            if (document.getElementById('adminPass').value === '2006') {
                 isAdmin = true;
-                document.getElementById('adminAuth').style.display = 'none';
-                document.getElementById('adminControls').style.display = 'block';
-                document.getElementById('absentAccordionGroup').style.display = 'block';
+                closeAdminModal();
+                document.getElementById('adminPanelSection').style.display = 'block';
                 loadData();
             } else { 
                 showModal('❌', 'Password မှားယွင်းနေပါသည်', 'ဆရာ/မ လျှို့ဝှက်နံပါတ်ကို တိကျစွာ ရိုက်ထည့်ပါ။'); 
@@ -275,15 +290,12 @@
 
         function logoutAdmin() {
             isAdmin = false;
-            document.getElementById('adminAuth').style.display = 'block';
-            document.getElementById('adminControls').style.display = 'none';
-            document.getElementById('absentAccordionGroup').style.display = 'none';
+            document.getElementById('adminPanelSection').style.display = 'none';
             document.getElementById('adminPass').value = '';
             document.getElementById('filterDate').value = getTodayISO();
             loadData();
         }
 
-        // ယနေ့အတွက် စာရင်း ပိတ်/ဖွင့် နှင့် Auto-Save ပြုလုပ်ခြင်း Logic
         function toggleFormLock() {
             const todayISO = getTodayISO();
             let isLocked = JSON.parse(localStorage.getItem('lock_' + todayISO)) || false;
@@ -293,7 +305,7 @@
             checkFormStatus();
 
             if (isLocked) {
-                showModal('🔒', 'ယနေ့အတွက် စာရင်းပိတ်ပြီးပါပြီ', 'ယနေ့စာရင်းများကို အောင်မြင်စွာ အော်တို သိမ်းဆည်းပြီးပါပြီ။ နောက်ရက်များတွင် ရက်စွဲရွေးချယ်၍ ပြန်လည်ကြည့်ရှုနိုင်ပါသည်။');
+                showModal('🔒', 'ယနေ့အတွက် စာရင်းပိတ်ပြီးပါပြီ', 'ယနေ့ စာရင်းများကို အော်တို သိမ်းဆည်းပြီးပါပြီ။');
             } else {
                 showModal('🔓', 'စာရင်း ပြန်ဖွင့်လိုက်ပါပြီ', 'ကျောင်းသားများ စာရင်းပြန်လည် တင်နိုင်ပါပြီ။');
             }
@@ -341,7 +353,6 @@
             loadData();
         }
 
-        // Student Form Submit
         document.getElementById('attendanceForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -398,43 +409,39 @@
             loadData();
         }
 
-        // Render Data Logic
         function loadData() {
             let records = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
-            
             const selectedDateISO = isAdmin ? document.getElementById('filterDate').value : getTodayISO();
-            
             const filteredRecords = records.filter(r => r.dateISO === selectedDateISO);
 
-            const presentList = filteredRecords.filter(r => r.category === 'ရောက်ရှိ');
-            const leaveList = filteredRecords.filter(r => r.category === 'ခွင့်');
-
-            // 1. ရောက်ရှိ စာရင်း
-            const presentBody = document.getElementById('presentBody');
-            presentBody.innerHTML = presentList.length ? '' : '<tr><td colspan="5" style="text-align:center;">စာရင်း မရှိပါ။</td></tr>';
-            presentList.forEach(r => {
-                let statusBadge = r.approved ? '<span class="badge-approved">အတည်ပြုပြီး</span>' : '<span class="badge-pending">စောင့်ဆိုင်းဆဲ</span>';
-                let actionBtn = (isAdmin && !r.approved) ? `<button class="btn btn-success" style="padding: 4px 8px; font-size: 12px;" onclick="approveRecord(${r.id})">Approve</button>` : '-';
-                presentBody.innerHTML += `<tr><td>${r.name}</td><td>${r.grade}</td><td>${r.dateTime}</td><td>${statusBadge}</td><td>${actionBtn}</td></tr>`;
-            });
-            document.getElementById('presentCount').innerText = `(${presentList.length})`;
-
-            // 2. ခွင့် စာရင်း
-            const leaveBody = document.getElementById('leaveBody');
-            leaveBody.innerHTML = leaveList.length ? '' : '<tr><td colspan="6" style="text-align:center;">ခွင့်စာရင်း မရှိပါ။</td></tr>';
-            leaveList.forEach(r => {
-                let statusBadge = r.approved ? '<span class="badge-approved">အတည်ပြုပြီး</span>' : '<span class="badge-pending">စောင့်ဆိုင်းဆဲ</span>';
-                let actionBtn = (isAdmin && !r.approved) ? `<button class="btn btn-success" style="padding: 4px 8px; font-size: 12px;" onclick="approveRecord(${r.id})">Approve</button>` : '-';
-                leaveBody.innerHTML += `<tr><td>${r.name}</td><td>${r.grade}</td><td>${r.dateTime}</td><td>${r.reason}</td><td>${statusBadge}</td><td>${actionBtn}</td></tr>`;
-            });
-            document.getElementById('leaveCount').innerText = `(${leaveList.length})`;
-
-            // 3. ခွင့်မဲ့ စာရင်း (Only generated when Admin is logged in)
             if (isAdmin) {
+                const presentList = filteredRecords.filter(r => r.category === 'ရောက်ရှိ');
+                const leaveList = filteredRecords.filter(r => r.category === 'ခွင့်');
+
+                // 1. Present List
+                const presentBody = document.getElementById('presentBody');
+                presentBody.innerHTML = presentList.length ? '' : '<tr><td colspan="5" style="text-align:center;">စာရင်း မရှိပါ။</td></tr>';
+                presentList.forEach(r => {
+                    let statusBadge = r.approved ? '<span class="badge-approved">အတည်ပြုပြီး</span>' : '<span class="badge-pending">စောင့်ဆိုင်းဆဲ</span>';
+                    let actionBtn = !r.approved ? `<button class="btn btn-success" style="padding: 4px 8px; font-size: 12px;" onclick="approveRecord(${r.id})">Approve</button>` : '-';
+                    presentBody.innerHTML += `<tr><td>${r.name}</td><td>${r.grade}</td><td>${r.dateTime}</td><td>${statusBadge}</td><td>${actionBtn}</td></tr>`;
+                });
+                document.getElementById('presentCount').innerText = `(${presentList.length})`;
+
+                // 2. Leave List
+                const leaveBody = document.getElementById('leaveBody');
+                leaveBody.innerHTML = leaveList.length ? '' : '<tr><td colspan="6" style="text-align:center;">ခွင့်စာရင်း မရှိပါ။</td></tr>';
+                leaveList.forEach(r => {
+                    let statusBadge = r.approved ? '<span class="badge-approved">အတည်ပြုပြီး</span>' : '<span class="badge-pending">စောင့်ဆိုင်းဆဲ</span>';
+                    let actionBtn = !r.approved ? `<button class="btn btn-success" style="padding: 4px 8px; font-size: 12px;" onclick="approveRecord(${r.id})">Approve</button>` : '-';
+                    leaveBody.innerHTML += `<tr><td>${r.name}</td><td>${r.grade}</td><td>${r.dateTime}</td><td>${r.reason}</td><td>${statusBadge}</td><td>${actionBtn}</td></tr>`;
+                });
+                document.getElementById('leaveCount').innerText = `(${leaveList.length})`;
+
+                // 3. Absent List
                 const absentBody = document.getElementById('absentBody');
                 absentBody.innerHTML = '';
                 let absentCount = 0;
-
                 const formattedDate = new Date(selectedDateISO).toLocaleDateString('en-GB');
 
                 masterStudents.forEach(student => {
@@ -449,16 +456,16 @@
                     absentBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:green; font-weight:bold;">🎉 ပျက်ကွက်သူ မရှိပါ။</td></tr>';
                 }
                 document.getElementById('absentCount').innerText = `(${absentCount})`;
-            }
 
-            // Unapproved Notif Badge for Admin
-            const pendingCount = records.filter(r => !r.approved).length;
-            const badge = document.getElementById('pendingNotifBadge');
-            if (pendingCount > 0) {
-                badge.style.display = 'inline-block';
-                badge.innerText = `စာရင်းအသစ် (${pendingCount})`;
-            } else {
-                badge.style.display = 'none';
+                // Notification Badge inside Admin Panel ONLY
+                const pendingCount = records.filter(r => !r.approved).length;
+                const badge = document.getElementById('pendingNotifBadge');
+                if (pendingCount > 0) {
+                    badge.style.display = 'inline-block';
+                    badge.innerText = `🔔 စာရင်းအသစ် (${pendingCount}) ခုရှိသည်`;
+                } else {
+                    badge.style.display = 'none';
+                }
             }
 
             checkFormStatus();
