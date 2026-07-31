@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ကျောင်းသား/ဝန်ထမ်း ဆိုင်းအင် စနစ်</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Padauk', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 450px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-top: 0;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: #fff;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .table-container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .clear-btn {
+            background-color: #dc3545;
+            margin-top: 15px;
+            width: auto;
+            float: right;
+        }
+        .clear-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sign-in ဖြည့်ရန် Form -->
+    <div class="container">
+        <h2>အလုပ်ဝင်/တက်ရောက်ကြောင်း မှတ်တမ်း</h2>
+        <form id="attendanceForm">
+            <div class="form-group">
+                <label for="empName">အမည်:</label>
+                <input type="text" id="empName" placeholder="ဥပမာ - မောင်မောင်" required>
+            </div>
+            <div class="form-group">
+                <label for="studentGrade">အတန်း ရွေးချယ်ပါ:</label>
+                <!-- Multiple Choice (Dropdown List) -->
+                <select id="studentGrade" required>
+                    <option value="" disabled selected>-- အတန်းရွေးပါ --</option>
+                    <option value="Grade 12">Grade 12</option>
+                    <option value="Grade 11">Grade 11</option>
+                    <option value="Grade 10">Grade 10</option>
+                    <option value="Grade 9">Grade 9</option>
+                    <option value="Grade 8">Grade 8</option>
+                    <option value="Grade 7">Grade 7</option>
+                </select>
+            </div>
+            <button type="submit">Sign In (ဆိုင်းအင် ထိုးမည်)</button>
+        </form>
+    </div>
+
+    <!-- မှတ်တမ်းဇယား -->
+    <div class="table-container">
+        <h3>ယနေ့ ဆိုင်းအင် ဝင်ထားသူများ စာရင်း</h3>
+        <table id="attendanceTable">
+            <thead>
+                <tr>
+                    <th>စဉ်</th>
+                    <th>အမည်</th>
+                    <th>အတန်း</th>
+                    <th>ရက်စွဲ</th>
+                    <th>ဝင်ရောက်သည့် အချိန်</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Data များ ဒီနေရာမှာ ပေါ်လာမည် -->
+            </tbody>
+        </table>
+        <button class="clear-btn" onclick="clearData()">မှတ်တမ်းများ ရှင်းထုတ်မည်</button>
+    </div>
+
+    <script>
+        const form = document.getElementById('attendanceForm');
+        const tableBody = document.getElementById('tableBody');
+
+        document.addEventListener('DOMContentLoaded', displayRecords);
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const empName = document.getElementById('empName').value;
+            const studentGrade = document.getElementById('studentGrade').value;
+            
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('my-MM');
+            const timeStr = now.toLocaleTimeString();
+
+            const record = {
+                name: empName,
+                grade: studentGrade,
+                date: dateStr,
+                time: timeStr
+            };
+
+            let records = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
+            records.push(record);
+            localStorage.setItem('attendanceRecords', JSON.stringify(records));
+
+            form.reset();
+            displayRecords();
+        });
+
+        function displayRecords() {
+            let records = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
+            tableBody.innerHTML = '';
+
+            records.forEach((rec, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${rec.name}</td>
+                    <td>${rec.grade}</td>
+                    <td>${rec.date}</td>
+                    <td>${rec.time}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function clearData() {
+            if (confirm('မှတ်တမ်းအားလုံးကို ဖျက်ရန် သေချာပါသလား?')) {
+                localStorage.removeItem('attendanceRecords');
+                displayRecords();
+            }
+        }
+    </script>
+
+</body>
+</html>
