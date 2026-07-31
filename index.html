@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ကျောင်းသား တက်ရောက်/ပျက်ကွက် မှတ်တမ်းစနစ်</title>
+    <title>ကျောင်းသား တက်ရောက်မှု စနစ်</title>
     <style>
         * {
             box-sizing: border-box;
             font-family: 'Padauk', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         body {
-            background-color: #f4f7f6;
+            background-color: #f0f2f5;
             margin: 0;
             padding: 20px;
             display: flex;
@@ -20,173 +20,251 @@
         .container {
             background: #ffffff;
             padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             width: 100%;
-            max-width: 500px;
+            max-width: 800px;
             margin-bottom: 20px;
         }
-        h2, h3 {
+        h2 {
             text-align: center;
-            color: #333;
+            color: #1a73e8;
             margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .form-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
         }
         .form-group {
+            flex: 1;
+            min-width: 200px;
             margin-bottom: 15px;
         }
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             font-weight: bold;
-            color: #555;
+            color: #444;
         }
         input, select {
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
+            border-radius: 6px;
+            font-size: 15px;
             background-color: #fff;
         }
-        button {
+        .submit-btn {
             width: 100%;
             padding: 12px;
-            background-color: #28a745;
+            background-color: #1a73e8;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 6px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: 0.2s;
         }
-        button:hover {
-            background-color: #218838;
+        .submit-btn:hover {
+            background-color: #1557b0;
         }
-        .tables-wrapper {
-            width: 100%;
-            max-width: 900px;
+
+        /* Filter Section */
+        .filter-section {
             display: flex;
-            flex-direction: column;
-            gap: 20px;
+            align-items: center;
+            justify-content: space-between;
+            background: #e8f0fe;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
         }
-        .table-container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            overflow-x: auto;
+        .filter-section label {
+            margin: 0;
+            color: #1967d2;
         }
+        .filter-section input[type="date"] {
+            width: auto;
+            font-weight: bold;
+        }
+
+        /* Collapsible Buttons & Content Boxes */
+        .accordion-item {
+            margin-bottom: 12px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+        .accordion-btn {
+            width: 100%;
+            padding: 15px;
+            text-align: left;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            outline: none;
+        }
+        .btn-present { background-color: #28a745; }
+        .btn-present:hover { background-color: #218838; }
+
+        .btn-leave { background-color: #f39c12; }
+        .btn-leave:hover { background-color: #d35400; }
+
+        .btn-absent { background-color: #dc3545; }
+        .btn-absent:hover { background-color: #c82333; }
+
+        .accordion-content {
+            display: none;
+            background-color: #fff;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        /* Tables Inside Accordion */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
         }
         th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
+            border-bottom: 1px solid #eee;
+            padding: 8px 10px;
             text-align: left;
+            font-size: 14px;
         }
         th {
-            background-color: #007bff;
-            color: white;
+            background-color: #f8f9fa;
+            color: #555;
         }
-        .absent-header {
-            background-color: #dc3545;
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        .clear-btn {
-            background-color: #dc3545;
-            margin-top: 15px;
-            width: auto;
-            float: right;
-        }
-        .clear-btn:hover {
-            background-color: #c82333;
-        }
-        .badge-present {
-            color: #28a745;
-            font-weight: bold;
-        }
-        .badge-absent {
-            color: #dc3545;
-            font-weight: bold;
-        }
+        .badge-absent { color: #dc3545; font-weight: bold; }
+        .badge-leave { color: #f39c12; font-weight: bold; }
+        .badge-present { color: #28a745; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <!-- Sign-in ဖြည့်ရန် Form -->
     <div class="container">
-        <h2>အလုပ်ဝင်/တက်ရောက်ကြောင်း မှတ်တမ်း</h2>
+        <h2>ကျောင်းသား/သူ ဆိုင်းအင် နှင့် ခွင့်တိုင်စနစ်</h2>
+        
+        <!-- Form -->
         <form id="attendanceForm">
-            <div class="form-group">
-                <label for="studentGrade">အတန်း ရွေးချယ်ပါ:</label>
-                <select id="studentGrade" onchange="updateStudentOptions()" required>
-                    <option value="" disabled selected>-- အတန်းရွေးပါ --</option>
-                    <option value="Grade 12">Grade 12</option>
-                    <option value="Grade 10">Grade 10</option>
-                    <option value="Grade 9">Grade 9</option>
-                    <option value="Grade 7">Grade 7</option>
-                </select>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="empName">ကျောင်းသား/သူ အမည်:</label>
+                    <input type="text" id="empName" placeholder="ဥပမာ - မောင်မောင်" required>
+                </div>
+                <div class="form-group">
+                    <label for="studentGrade">အတန်း ရွေးပါ:</label>
+                    <select id="studentGrade" required>
+                        <option value="" disabled selected>-- အတန်းရွေးပါ --</option>
+                        <option value="Grade 12">Grade 12</option>
+                        <option value="Grade 10">Grade 10</option>
+                        <option value="Grade 9">Grade 9</option>
+                        <option value="Grade 7">Grade 7</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="actionType">အခြေအနေ ရွေးပါ:</label>
+                    <select id="actionType" required onchange="toggleReasonField()">
+                        <option value="present">ကျောင်းတက်မည် (Sign In)</option>
+                        <option value="leave">ခွင့်တိုင်မည် (Leave)</option>
+                    </select>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="empName">ကျောင်းသား/သူ အမည်:</label>
-                <select id="empName" required disabled>
-                    <option value="" disabled selected>-- အရင်ဆုံး အတန်းရွေးပါ --</option>
-                </select>
+
+            <!-- ခွင့်တိုင်မှ ပေါ်လာမည့် အကွက် -->
+            <div class="form-group" id="reasonGroup" style="display: none;">
+                <label for="leaveReason">ခွင့်တိုင်ရသည့် အကြောင်းအရင်း:</label>
+                <input type="text" id="leaveReason" placeholder="ဥပမာ - နေမကောင်းလို့ပါ / ခရီးသွားလို့ပါ">
             </div>
-            <button type="submit">Sign In (ဆိုင်းအင် ထိုးမည်)</button>
+
+            <button type="submit" class="submit-btn">Submit ပြုလုပ်မည်</button>
         </form>
     </div>
 
-    <!-- မှတ်တမ်းဇယားများ -->
-    <div class="tables-wrapper">
-        
-        <!-- တက်ရောက်သူများ ဇယား -->
-        <div class="table-container">
-            <h3 style="color: #28a745;">ယနေ့ တက်ရောက်သူများ စာရင်း (Present)</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>စဉ်</th>
-                        <th>အမည်</th>
-                        <th>အတန်း</th>
-                        <th>ဝင်ရောက်သည့် အချိန်</th>
-                        <th>အခြေအနေ</th>
-                    </tr>
-                </thead>
-                <tbody id="presentBody">
-                    <!-- Data များ ဒီနေရာမှာ ပေါ်လာမည် -->
-                </tbody>
-            </table>
+    <!-- Main Lists Container -->
+    <div class="container">
+        <!-- Date Filter -->
+        <div class="filter-section">
+            <label for="filterDate">📅 စစ်ဆေးလိုသည့် ရက်စွဲ ရွေးပါ: </label>
+            <input type="date" id="filterDate">
         </div>
 
-        <!-- ပျက်ကွက်သူများ ဇယား -->
-        <div class="table-container">
-            <h3 style="color: #dc3545;">ယနေ့ ပျက်ကွက်သူများ စာရင်း (Absent)</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th class="absent-header">စဉ်</th>
-                        <th class="absent-header">အမည်</th>
-                        <th class="absent-header">အတန်း</th>
-                        <th class="absent-header">အခြေအနေ</th>
-                    </tr>
-                </thead>
-                <tbody id="absentBody">
-                    <!-- ပျက်ကွက်သူများ ဒီနေရာမှာ အလိုအလျောက် ပေါ်လာမည် -->
-                </tbody>
-            </table>
-            <button class="clear-btn" onclick="clearData()">ယနေ့ မှတ်တမ်းများ ပြန်ရှင်းမည်</button>
+        <!-- Button 1: တက်ရောက်သူများ -->
+        <div class="accordion-item">
+            <button class="accordion-btn btn-present" onclick="toggleAccordion('presentBox')">
+                <span>✅ တက်ရောက်သူများ စာရင်း</span>
+                <span id="presentCount">(0) 🔽</span>
+            </button>
+            <div id="presentBox" class="accordion-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>စဉ်</th>
+                            <th>အမည်</th>
+                            <th>အတန်း</th>
+                            <th>အချိန်</th>
+                        </tr>
+                    </thead>
+                    <tbody id="presentBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Button 2: ခွင့်ယူသူများ -->
+        <div class="accordion-item">
+            <button class="accordion-btn btn-leave" onclick="toggleAccordion('leaveBox')">
+                <span>📝 ခွင့်ယူသူများ စာရင်း</span>
+                <span id="leaveCount">(0) 🔽</span>
+            </button>
+            <div id="leaveBox" class="accordion-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>စဉ်</th>
+                            <th>အမည်</th>
+                            <th>အတန်း</th>
+                            <th>အကြောင်းအရင်း</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaveBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Button 3: ခွင့်မဲ့ပျက်ကွက်သူများ -->
+        <div class="accordion-item">
+            <button class="accordion-btn btn-absent" onclick="toggleAccordion('absentBox')">
+                <span>❌ ခွင့်မဲ့ ပျက်ကွက်သူများ စာရင်း</span>
+                <span id="absentCount">(0) 🔽</span>
+            </button>
+            <div id="absentBox" class="accordion-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>စဉ်</th>
+                            <th>အမည်</th>
+                            <th>အတန်း</th>
+                            <th>အခြေအနေ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="absentBody"></tbody>
+                </table>
+            </div>
         </div>
 
     </div>
 
     <script>
-        // ကျောင်းသား မာစတာ စာရင်း (ဒီနေရာမှာ ကျောင်းသား အမည်များကို ပြင်ဆင်/ထပ်တိုးနိုင်ပါတယ်)
+        // ၁။ ကုဒ်ထဲမှာပဲ သိမ်းဆည်းထားသော စုစုပေါင်း ကျောင်းသားစာရင်း (ဝက်ဘ်ဆိုဒ်မှာ တန်းမပေါ်ပါ)
         const masterStudents = [
             { name: "မောင်မောင်", grade: "Grade 12" },
             { name: "အောင်အောင်", grade: "Grade 12" },
@@ -200,102 +278,175 @@
         ];
 
         const form = document.getElementById('attendanceForm');
+        const nameInput = document.getElementById('empName');
         const gradeSelect = document.getElementById('studentGrade');
-        const nameSelect = document.getElementById('empName');
+        const actionSelect = document.getElementById('actionType');
+        const reasonInput = document.getElementById('leaveReason');
+        const reasonGroup = document.getElementById('reasonGroup');
+        const filterDateInput = document.getElementById('filterDate');
+
         const presentBody = document.getElementById('presentBody');
+        const leaveBody = document.getElementById('leaveBody');
         const absentBody = document.getElementById('absentBody');
 
-        document.addEventListener('DOMContentLoaded', displayTables);
-
-        // အတန်း ရွေးလိုက်ပါက ထိုအတန်းရှိ ကျောင်းသား နာမည်များသာ Dropdown တွင် ပေါ်စေရန်
-        function updateStudentOptions() {
-            const selectedGrade = gradeSelect.value;
-            nameSelect.innerHTML = '<option value="" disabled selected>-- နာမည်ရွေးပါ --</option>';
-            
-            const filteredStudents = masterStudents.filter(s => s.grade === selectedGrade);
-            filteredStudents.forEach(student => {
-                const opt = document.createElement('option');
-                opt.value = student.name;
-                opt.textContent = student.name;
-                nameSelect.appendChild(opt);
-            });
-
-            nameSelect.disabled = false;
+        function toggleReasonField() {
+            if (actionSelect.value === 'leave') {
+                reasonGroup.style.display = 'block';
+                reasonInput.required = true;
+            } else {
+                reasonGroup.style.display = 'none';
+                reasonInput.required = false;
+            }
         }
 
+        // Button နှိပ်မှ Box ပွင့်လာစေသည့် Function
+        function toggleAccordion(boxId) {
+            const box = document.getElementById(boxId);
+            if (box.style.display === "block") {
+                box.style.display = "none";
+            } else {
+                box.style.display = "block";
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date().toISOString().split('T')[0];
+            filterDateInput.value = today;
+            loadDashboardData(today);
+        });
+
+        filterDateInput.addEventListener('change', (e) => {
+            loadDashboardData(e.target.value);
+        });
+
+        // Form Submit လုပ်ဆောင်ချက်
         form.addEventListener('submit', function(e) {
             e.preventDefault();
 
+            const empName = nameInput.value.trim();
             const studentGrade = gradeSelect.value;
-            const empName = nameSelect.value;
+            const action = actionSelect.value;
+            const reason = reasonInput.value.trim();
             const now = new Date();
+            const dateISO = now.toISOString().split('T')[0];
             const timeStr = now.toLocaleTimeString();
 
-            let records = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
-            
-            // ထပ်ပြီး Sign In မဝင်အောင် စစ်ဆေးခြင်း
-            const alreadySignedIn = records.some(r => r.name === empName && r.grade === studentGrade);
-            if (alreadySignedIn) {
-                alert('ဒီကျောင်းသား ဆိုင်းအင် ထိုးပြီးသား ဖြစ်ပါတယ်။');
+            // ၂။ နာမည် တိုက်စစ်ခြင်း (Master List ထဲမှာ မပါရင် ငြင်းမည်)
+            const isValidStudent = masterStudents.some(s => 
+                s.name.toLowerCase() === empName.toLowerCase() && 
+                s.grade === studentGrade
+            );
+
+            if (!isValidStudent) {
+                alert(`⚠️ "${empName}" (${studentGrade}) သည် ကျောင်းသား စာရင်းထဲတွင် မရှိပါ။ ကျေးဇူးပြု၍ အမည်နှင့် အတန်း မှန်ကန်စွာ ရိုက်ထည့်ပါ။`);
                 return;
             }
 
+            let records = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
+            
+            // ထပ်ပြီး မလုပ်မိအောင် စစ်ခြင်း
+            const alreadySubmitted = records.some(r => 
+                r.name.toLowerCase() === empName.toLowerCase() && 
+                r.grade === studentGrade && 
+                r.date === dateISO
+            );
+
+            if (alreadySubmitted) {
+                alert('⚠️ ဒီကျောင်းသား ဒီနေ့အတွက် စာရင်းသွင်းပြီးသား ဖြစ်ပါတယ်။');
+                return;
+            }
+
+            // စာရင်းထဲ ထည့်မည်
             records.push({
                 name: empName,
                 grade: studentGrade,
-                time: timeStr
+                date: dateISO,
+                time: timeStr,
+                status: action,
+                reason: action === 'leave' ? reason : '-'
             });
 
             localStorage.setItem('attendanceRecords', JSON.stringify(records));
 
-            form.reset();
-            nameSelect.disabled = true;
-                nameSelect.innerHTML = '<option value="" disabled selected>-- အရင်ဆုံး အတန်းရွေးပါ --</option>';
+            // ၃။ ပြီးကြောင်း နိုတီပြခြင်း
+            if (action === 'present') {
+                alert(`✅ Sign In ဝင်ရောက်ခြင်း အောင်မြင်ပါသည်!\nအမည်: ${empName}\nအချိန်: ${timeStr}`);
+            } else {
+                alert(`📝 ခွင့်တိုင်ကြားမှု အောင်မြင်ပါသည်!\nအမည်: ${empName}`);
+            }
 
-            displayTables();
+            form.reset();
+            toggleReasonField();
+            loadDashboardData(filterDateInput.value);
         });
 
-        function displayTables() {
+        function loadDashboardData(selectedDate) {
             let records = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
             
-            // ၁။ တက်ရောက်သူများ ဇယား ပြသခြင်း
-            presentBody.innerHTML = '';
-            records.forEach((rec, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${rec.name}</td>
-                    <td>${rec.grade}</td>
-                    <td>${rec.time}</td>
-                    <td><span class="badge-present">တက်ရောက်</span></td>
-                `;
-                presentBody.appendChild(row);
-            });
+            const dayRecords = records.filter(r => r.date === selectedDate);
+            const presentRecords = dayRecords.filter(r => r.status === 'present');
+            const leaveRecords = dayRecords.filter(r => r.status === 'leave');
 
-            // ၂။ ပျက်ကွက်သူများ ဇယား တွက်ချက် ပြသခြင်း
+            // ၁။ တက်ရောက်သူများ
+            presentBody.innerHTML = '';
+            if (presentRecords.length === 0) {
+                presentBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">စာရင်းမရှိပါ။</td></tr>';
+            } else {
+                presentRecords.forEach((rec, index) => {
+                    presentBody.innerHTML += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${rec.name}</td>
+                            <td>${rec.grade}</td>
+                            <td>${rec.time}</td>
+                        </tr>`;
+                });
+            }
+            document.getElementById('presentCount').innerText = `(${presentRecords.length}) 🔽`;
+
+            // ၂။ ခွင့်ယူသူများ
+            leaveBody.innerHTML = '';
+            if (leaveRecords.length === 0) {
+                leaveBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">ခွင့်တိုင်သူ မရှိပါ။</td></tr>';
+            } else {
+                leaveRecords.forEach((rec, index) => {
+                    leaveBody.innerHTML += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${rec.name}</td>
+                            <td>${rec.grade}</td>
+                            <td>${rec.reason}</td>
+                        </tr>`;
+                });
+            }
+            document.getElementById('leaveCount').innerText = `(${leaveRecords.length}) 🔽`;
+
+            // ၃။ ခွင့်မဲ့ ပျက်ကွက်သူများ
             absentBody.innerHTML = '';
-            let absentIndex = 1;
+            let absentCount = 0;
 
             masterStudents.forEach(student => {
-                const isPresent = records.some(r => r.name === student.name && r.grade === student.grade);
-                if (!isPresent) {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${absentIndex++}</td>
-                        <td>${student.name}</td>
-                        <td>${student.grade}</td>
-                        <td><span class="badge-absent">ပျက်ကွက်</span></td>
-                    `;
-                    absentBody.appendChild(row);
+                const hasAction = dayRecords.some(r => 
+                    r.name.toLowerCase() === student.name.toLowerCase() && 
+                    r.grade === student.grade
+                );
+
+                if (!hasAction) {
+                    absentCount++;
+                    absentBody.innerHTML += `
+                        <tr>
+                            <td>${absentCount}</td>
+                            <td>${student.name}</td>
+                            <td>${student.grade}</td>
+                            <td><span class="badge-absent">ခွင့်မဲ့ ပျက်ကွက်</span></td>
+                        </tr>`;
                 }
             });
-        }
 
-        function clearData() {
-            if (confirm('ယနေ့ မှတ်တမ်းအားလုံးကို ရှင်းလင်းရန် သေချာပါသလား?')) {
-                localStorage.removeItem('attendanceRecords');
-                displayTables();
+            if (absentCount === 0) {
+                absentBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:green; font-weight:bold;">🎉 ပျက်ကွက်သူ မရှိပါ။</td></tr>';
             }
+            document.getElementById('absentCount').innerText = `(${absentCount}) 🔽`;
         }
     </script>
 
